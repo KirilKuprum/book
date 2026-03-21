@@ -11,18 +11,20 @@ namespace Backend.Services
         {
             _context = context;
         }
+        public List<UserDTO> GetAll() => _context.Users
+            .Select(user => new UserDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role
+            }).ToList();
 
-        public List<User> GetAll() => _context.Users.ToList();
         public User? GetUserById(int id)
         {
             return _context.Users.FirstOrDefault(u => u.Id == id);
         }
 
-        public void Add(User user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-        }
         public bool Delete(int id)
         {
             User? foundUser = GetUserById(id);
@@ -32,22 +34,28 @@ namespace Backend.Services
             _context.SaveChanges();
             return true;
         }
-        public bool Update(User user)
+        public bool Update(UserDTO userDTO)
         {
-            User? foundUser = GetUserById(user.Id);
+            User? foundUser = GetUserById(userDTO.Id);
             if (foundUser is null)
                 return false;
-            foundUser.Name = user.Name;
-            foundUser.Email = user.Email;
-            foundUser.Role = user.Role;
+            foundUser.Name = userDTO.Name;
+            foundUser.Email = userDTO.Email;
+            foundUser.Role = userDTO.Role;
             _context.SaveChanges();
             return true;
         }
 
 
-        public void RegisterUser(User user)
+        public void RegisterUser(UserRegisterDTO userRegisterDTO)
         {
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+            var user = new User
+            {
+                Name = userRegisterDTO.Name,
+                Email = userRegisterDTO.Email,
+                Role = "User", 
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userRegisterDTO.Password) 
+            };
             _context.Users.Add(user);
             _context.SaveChanges();
         }

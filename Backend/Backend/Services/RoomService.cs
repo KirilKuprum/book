@@ -17,8 +17,16 @@ namespace Backend.Services
         {
             return _context.Rooms.FirstOrDefault(u => u.Id == id);
         }
-        public void Add(Room room)
+        public void Add(RoomDTO roomDTO)
         {
+            var room = new Room
+            {
+                Name = roomDTO.Name,
+                Description = roomDTO.Description,
+                Price = roomDTO.Price,
+                IsOccupied = false 
+            };
+
             _context.Rooms.Add(room);
             _context.SaveChanges();
         }
@@ -31,15 +39,14 @@ namespace Backend.Services
             _context.SaveChanges();
             return true;
         }
-        public bool Update(Room room)
+        public bool Update(int id, RoomDTO roomDTO)
         {
-            Room? foundRoom = GetRoomById(room.Id);
+            Room? foundRoom = GetRoomById(id);
             if (foundRoom is null)
                 return false;
-            foundRoom.Name = room.Name;
-            foundRoom.Description = room.Description;
-            foundRoom.Price = room.Price;
-            foundRoom.IsOccupied = room.IsOccupied;
+            foundRoom.Name = roomDTO.Name;
+            foundRoom.Description = roomDTO.Description;
+            foundRoom.Price = roomDTO.Price;
             _context.SaveChanges();
             return true;
         }

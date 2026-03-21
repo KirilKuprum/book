@@ -23,17 +23,22 @@ namespace Backend.Services
             return _context.Rooms.FirstOrDefault(u => u.Id == id);
         }
 
-        public Book Add(Book book)
+        public Book Add(BookDTO bookDTO)
         {
-            Room? foundRoom = GetRoomById(book.RoomId);  
-            if(book.DateStart > book.DateEnd)
+            Room? foundRoom = GetRoomById(bookDTO.RoomId);
+            if (foundRoom == null || foundRoom.IsOccupied || bookDTO.DateStart > bookDTO.DateEnd)
                 return null;
 
-            int dayDist = book.DateEnd.DayNumber - book.DateStart.DayNumber;
-            book.TotalPrice = foundRoom.Price * dayDist;
+            int dayDist = bookDTO.DateEnd.DayNumber - bookDTO.DateStart.DayNumber;
 
-            if (foundRoom.IsOccupied)
-                return null;
+            var book = new Book
+            {
+                UserId = bookDTO.UserId,
+                RoomId = bookDTO.RoomId,
+                DateStart = bookDTO.DateStart,
+                DateEnd = bookDTO.DateEnd,
+                TotalPrice = foundRoom.Price * dayDist 
+            };
 
             foundRoom.IsOccupied = true;
 
@@ -44,35 +49,31 @@ namespace Backend.Services
         public bool Delete(int id)
         {
             Book? foundBook = GetBookById(id);
-            Room? foundRoom = GetRoomById(foundBook.RoomId);
-
             if (foundBook is null)
                 return false;
-            if (foundRoom is null)
-                return false;
+            Room? foundRoom = GetRoomById(foundBook.RoomId);
 
-            foundRoom.IsOccupied = false;
+            if (foundRoom != null)
+                foundRoom.IsOccupied = false;
+
             _context.Books.Remove(foundBook);
             _context.SaveChanges();
             return true;
         }
-        public bool Update(Book book)
+        public bool Update(int id, BookDTO bookDTO)
         {
-            Book? foundBook = GetBookById(book.Id);
+            Book? foundBook = GetBookById(id);
             if (foundBook is null)
                 return false;
 
-            Room? foundRoom = GetRoomById(book.RoomId);
-            if (foundRoom is null)
+            Room? foundRoom = GetRoomById(bookDTO.RoomId);
+            if (foundRoom is null || bookDTO.DateStart > bookDTO.DateEnd)
                 return false;
 
-            if (book.DateStart > book.DateEnd) 
-                return false;
-
-            foundBook.UserId = book.UserId;
-            foundBook.RoomId = book.RoomId;
-            foundBook.DateStart = book.DateStart;
-            foundBook.DateEnd = book.DateEnd;
+            foundBook.UserId = bookDTO.UserId;
+            foundBook.RoomId = bookDTO.RoomId;
+            foundBook.DateStart = bookDTO.DateStart;
+            foundBook.DateEnd = bookDTO.DateEnd;
 
             int dayDist = foundBook.DateEnd.DayNumber - foundBook.DateStart.DayNumber;
             if (dayDist < 1)

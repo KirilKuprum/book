@@ -19,7 +19,7 @@ namespace UsersAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<User>> GetUsers()
+        public ActionResult<List<UserDTO>> GetUsers()
         {
             return Ok(_userService.GetAll());
         }
@@ -35,9 +35,9 @@ namespace UsersAPI.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult RegisterUser([FromBody] User user)
+        public ActionResult RegisterUser([FromBody] UserRegisterDTO userRegisterDTO)
         {
-            _userService.RegisterUser(user);
+            _userService.RegisterUser(userRegisterDTO);
             return Ok();
         }
 

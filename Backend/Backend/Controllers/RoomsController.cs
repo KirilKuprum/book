@@ -40,29 +40,19 @@ namespace Backend.Controllers
         }
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
-        public ActionResult AddRoom([FromBody] Room room)
+        public ActionResult AddRoom([FromBody] RoomDTO roomDTO)
         {
-            _roomService.Add(room);
+            _roomService.Add(roomDTO);
             return Ok();
         }
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPut("{id}")]
-        public ActionResult PutRoom(int id, [FromBody] Room room)
+        public ActionResult PutRoom(int id, [FromBody] RoomDTO roomDTO)
         {
-            var upRoom = new Room
-            {
-                Id = id,
-                Name = room.Name,
-                Description = room.Description,
-                Price = room.Price,
-                IsOccupied = room.IsOccupied
-
-            };
-            if (_roomService.Update(upRoom))
-                return Ok(upRoom);
+            if (_roomService.Update(id, roomDTO))
+                return Ok("Кімнату оновлено");
             else
-                return BadRequest("Кімнату не знайдено");
-
+                return NotFound("Кімнату не знайдено");
         }
         
     }

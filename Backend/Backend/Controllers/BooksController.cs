@@ -40,27 +40,19 @@ namespace Backend.Controllers
         }
         [Authorize]
         [HttpPost]
-        public Book AddBook([FromBody] Book book)
+        public ActionResult AddBook([FromBody] BookDTO bookDTO)
         {
-            _bookService.Add(book);
-            return book;
+            _bookService.Add(bookDTO);
+            return Ok();
         }
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPut("{id}")]
-        public ActionResult PutBook(int id, [FromBody] Book book)
+        public ActionResult PutBook(int id, [FromBody] BookDTO bookDTO)
         {
-            var upBook = new Book
-            {
-                Id = id,
-                UserId = book.UserId,
-                RoomId = book.RoomId,
-                DateStart = book.DateStart,
-                DateEnd = book.DateEnd
-            };
-            if (_bookService.Update(upBook))
-                return Ok(upBook);
+            if (_bookService.Update(id, bookDTO))
+                return Ok("Букування оновлено");
             else
-                return BadRequest("Кімнату не знайдено");
+                return BadRequest("Букування не знайдено");
 
         }
 
