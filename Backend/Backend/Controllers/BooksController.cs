@@ -42,7 +42,13 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult AddBook([FromBody] BookDTO bookDTO)
         {
-            _bookService.Add(bookDTO);
+            var nameIdentifier = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(nameIdentifier, out int userId))
+                return Unauthorized("Не вдалося ідентифікувати користувача");
+
+            _bookService.Add(bookDTO, userId);
+
             return Ok();
         }
         [Authorize(Roles = "Admin,Moderator")]
@@ -53,7 +59,19 @@ namespace Backend.Controllers
                 return Ok("Букування оновлено");
             else
                 return BadRequest("Букування не знайдено");
+        }
+        [Authorize]
+        [HttpGet("my")]
+        public ActionResult<List<Book>> GetMyBooks()
+        {
+            var nameIdentifier = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
+            if (!int.TryParse(nameIdentifier, out int userId))
+                return Unauthorized("Не вдалося ідентифікувати користувача");
+            
+            var myBooks = _bookService.GetBooksByUserId(userId);
+
+            return Ok(myBooks);
         }
 
     }

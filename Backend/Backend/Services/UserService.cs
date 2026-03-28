@@ -24,7 +24,15 @@ namespace Backend.Services
         {
             return _context.Users.FirstOrDefault(u => u.Id == id);
         }
+        public bool MakeAdmin(int id)
+        {
+            var user = GetUserById(id);
+            if (user == null) return false;
 
+            user.Role = "Admin";
+            _context.SaveChanges();
+            return true;
+        }
         public bool Delete(int id)
         {
             User? foundUser = GetUserById(id);
@@ -47,7 +55,7 @@ namespace Backend.Services
         }
 
 
-        public void RegisterUser(UserRegisterDTO userRegisterDTO)
+        public User RegisterUser(UserRegisterDTO userRegisterDTO)
         {
             var user = new User
             {
@@ -58,6 +66,8 @@ namespace Backend.Services
             };
             _context.Users.Add(user);
             _context.SaveChanges();
+
+            return user;
         }
 
         public User? ValidateUser(UserLoginDTO credentials)

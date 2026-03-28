@@ -37,8 +37,9 @@ namespace UsersAPI.Controllers
         [HttpPost("register")]
         public ActionResult RegisterUser([FromBody] UserRegisterDTO userRegisterDTO)
         {
-            _userService.RegisterUser(userRegisterDTO);
-            return Ok();
+            var newUser = _userService.RegisterUser(userRegisterDTO);
+            var token = _tokenService.GenerateToken(newUser);
+            return Ok(new { token = token });
         }
 
         [HttpPost("login")]
@@ -48,7 +49,15 @@ namespace UsersAPI.Controllers
             if (user == null)
                 return Unauthorized();
             var token = _tokenService.GenerateToken(user);
-            return Ok(token);
+            return Ok(new { token = token });
+        }
+        [Authorize(Roles = "Admin")] 
+        [HttpDelete("{id}")]
+        public ActionResult DeleteUser(int id)
+        {
+            var result = _userService.Delete(id);
+            if (result) return Ok("Користувача видалено");
+            return NotFound("Користувача не знайдено");
         }
     }
 }
