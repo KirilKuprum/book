@@ -28,6 +28,7 @@ namespace Backend.Controllers
                 return NotFound("Букування не знайдено");
             return Ok(book);
         }
+
         [Authorize(Roles = "Admin,Moderator")]
         [HttpDelete("{id}")]
         public ActionResult DeleteBook(int id)
@@ -73,6 +74,5 @@ namespace Backend.Controllers
 
             return Ok(myBooks);
         }
-
     }
 }

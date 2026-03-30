@@ -78,21 +78,56 @@ input, select, button {
 }
 
 button {
-  background-color: #007bff;
-  color: #fff;
+  background-color: rgb(95, 94, 94);
+  color: white;
   border: none;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: rgb(48, 47, 47);
+}
+
+button.create {
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button.create:hover {
+  background-color: rgb(13, 78, 13);
+}
+
+button.del {
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button.del:hover {
+  background-color: rgb(223, 22, 22);
+}
+
+button.up {
+  background-color: rgb(105, 105, 63);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button.up:hover {
+  background-color: rgb(75, 75, 42);
 }
 
 .admin-grid {
-  display: flex;
   gap: 20px;
 }
-
+.admin-grid .admin-section{
+  justify-content: center;
+  align-items: center;
+}
 .admin-item {
   display: flex;
   justify-content: space-between;
@@ -119,4 +154,21 @@ button:hover {
 
 .auth-box input {
   width: 100%;
+}
+
+.admin-section {
+    width:80%;
+    text-align: center;
+    border: 5px solid black;
+    border-radius: 20px;
+    padding: 10px;
+    margin-top: 30px;
+    align-items: center;
+    justify-content: center;
+}
+.admin-section input{
+  width: 50%;
+}
+form.admin-form{
+  text-align: center;
 }

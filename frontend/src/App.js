@@ -242,6 +242,7 @@ function LoginPage() {
 function AdminPage() {
   const [users, setUsers] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [books, setBooks] = useState([]);
   const [roomForm, setRoomForm] = useState({ id: null, name: '', description: '', price: '' });
   const token = localStorage.getItem("accessToken");
 
@@ -250,6 +251,8 @@ function AdminPage() {
       .then(res => res.json()).then(setUsers);
     fetch(`${API_URL}/Rooms`, { headers: { "Authorization": `Bearer ${token}` }})
       .then(res => res.json()).then(setRooms);
+    fetch(`${API_URL}/Books`, { headers: { "Authorization": `Bearer ${token}` }})
+      .then(res => res.json()).then(setBooks);
   }
 
   useEffect(loadData, [token]);
@@ -291,13 +294,18 @@ function AdminPage() {
       .then(loadData);
   }
 
+  function deleteBook(id) {
+    fetch(`${API_URL}/Books/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` }})
+      .then(loadData);
+  }
   return (
     <div className="container">
       <h1>Адмін-панель</h1>
       <Link to="/">Назад</Link>
       
       <div className="admin-grid">
-        <section>
+        
+        <div className="admin-section">
           <h3>{roomForm.id ? "Редагувати кімнату" : "Додати нову кімнату"}</h3>
           <form onSubmit={saveRoom} className="admin-form">
             <input 
@@ -318,17 +326,21 @@ function AdminPage() {
               onChange={e => setRoomForm({...roomForm, price: e.target.value})}
               required 
             />
-            <button type="submit">{roomForm.id ? "Оновити" : "Створити"}</button>
+            <button className={roomForm.id ? "up" : "create"} type="submit">{roomForm.id ? "Оновити" : "Створити"}</button>
             {roomForm.id && <button onClick={() => setRoomForm({id: null, name: '',description:'', price: ''})}>Скасувати</button>}
           </form>
+        </div>
 
+        <section>
           <h3>Список кімнат</h3>
           {rooms.map(r => (
-            <div key={r.id} className="admin-item">
-              <span><b>{r.name}</b> — {r.price} грн</span>
-              <div>
-                <button onClick={() => setRoomForm({ id: r.id, name: r.name, description: r.description, price: r.price })}>Змінити</button>
-                <button onClick={() => deleteRoom(r.id)}>Видалити</button>
+            <div className="admin-item">
+              <span>
+                <p><b>{r.name}</b> — {r.price} грн</p>
+              </span>
+              <div className="div-but">
+                <button className="up" onClick={() => setRoomForm({ id: r.id, name: r.name, description: r.description, price: r.price })}>Змінити</button>
+                <button className="del" onClick={() => deleteRoom(r.id)}>Видалити</button>
               </div>
             </div>
           ))}
@@ -339,7 +351,22 @@ function AdminPage() {
           {users.map(u => (
             <div key={u.id} className="admin-item">
               <span>{u.email} ({u.role})</span>
-              <button onClick={() => deleteUser(u.id)}>Видалити</button>
+              <button className="del" onClick={() => deleteUser(u.id)}>Видалити</button>
+            </div>
+          ))}
+        </section>
+
+        <section>
+          <h3>Букінги</h3>
+          {books.map(b => (
+            <div className="admin-item">
+              <span>
+                <p>Користувач: {users.find(u => u.id === b.userId).email}</p>
+                <p>Кімната: {rooms.find(r => r.id === b.roomId)?.name || "Невідомо"}</p> 
+                <p>З {new Date(b.dateStart).toLocaleDateString()} по {new Date(b.dateEnd).toLocaleDateString()}</p>
+                <p>Вартість: {b.totalPrice} грн</p>
+              </span>
+              <button className="del" onClick={() => deleteBook(b.id)}>Видалити</button>
             </div>
           ))}
         </section>
