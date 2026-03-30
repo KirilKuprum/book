@@ -74,5 +74,19 @@ namespace Backend.Controllers
 
             return Ok(myBooks);
         }
+
+        [HttpGet("paged/{page}")]
+        public ActionResult<PagedResult<Book>> GetBooksPaged(int page, int size = 2)
+        {
+            var books = _bookService.GetAll();
+            return Ok(new PagedResult<Book>()
+            {
+                Items = books.GetRange((page - 1) * size, size),
+                TotalCount = books.Count(),
+                Page = page,
+                PagesCount = books.Count() / size,
+                PageSize = size
+            });
+        }
     }
 }

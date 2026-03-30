@@ -172,3 +172,13 @@ button.up:hover {
 form.admin-form{
   text-align: center;
 }
+.user{
+  border:5px solid black;
+  padding:5px;
+}
+.red{
+  color: red;
+}
+.price{
+  text-decoration: underline;
+}

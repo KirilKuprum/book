@@ -11,6 +11,10 @@ function IndexPage() {
   const [booking, setBooking] = useState({ roomId: '', dateStart: '', dateEnd: '' });
   const [myBookings, setMyBookings] = useState([]);
 
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pagesCount, setPagesCount] = useState(1);
+
   function loadMyBookings() {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
@@ -26,6 +30,17 @@ function IndexPage() {
       })
     .catch(err => { console.error("Помилка завантаження", err); });
   }
+  function fetchUsers() {
+    fetch(`${API_URL}/Books/paged/${page}`)
+        .then(response => response.json())
+        .then(data =>{
+          //console.log(data);
+          setData(data.items);
+          setPagesCount(data.pagesCount);
+        })
+  }
+
+  useEffect(fetchUsers, [page]);
 
   useEffect(function() {
     const token = localStorage.getItem("accessToken");
@@ -91,7 +106,7 @@ function IndexPage() {
       <div className="content-split">
         <section>
           <h3>Доступні кімнати</h3>
-          {rooms.filter(r => !r.isOccupied).map(function(r) {
+          {rooms.filter(r => !r.isOccupied).map(r => {
             return (
               <div className="card">
                 <h4>{r.name}</h4>
@@ -139,17 +154,25 @@ function IndexPage() {
       <hr/>
       
       <h3>Мої оренди</h3>
-      {myBookings.length > 0 ? (
-        myBookings.map(b => {
+      {data.length > 0 ? (
+        data.map(b => {
         return (
           <div className="card">
-            <p>Кімната: {rooms.find(r => r.id === b.roomId)?.name || "Невідомо"}</p>
-            <p>З {new Date(b.dateStart).toLocaleDateString()} по {new Date(b.dateEnd).toLocaleDateString()}</p>
-            <p>Вартість: {b.totalPrice} грн</p>
+            <p><b className='user'>Кімната</b> {rooms.find(r => r.id === b.roomId)?.name || "Невідомо"}</p>
+            <p>З <b className='red'>{new Date(b.dateStart).toLocaleDateString()}</b> по <b className='red'>{new Date(b.dateEnd).toLocaleDateString()}</b></p>
+            <p><b className='user'>Вартість</b> <b className='price'>{b.totalPrice} грн</b></p>
           </div>
         );
       })
       ) : <p>У вас ще немає бронювань</p>}
+      <div className='text-center'>
+        <button className='btn btn-outline-primary'>Prev.</button>
+        {[...Array(pagesCount)].map((_, i) => (
+          <button className='btn btn-outline-primary'
+           onClick={e => {setPage(i + 1)}}>{i + 1}</button>
+        ))}
+        <button className='btn btn-outline-primary'>Next</button>
+      </div>
     </div>
   );
 }
@@ -336,7 +359,7 @@ function AdminPage() {
           {rooms.map(r => (
             <div className="admin-item">
               <span>
-                <p><b>{r.name}</b> — {r.price} грн</p>
+                <p><b className="user">{r.name}</b> — {r.price} грн</p>
               </span>
               <div className="div-but">
                 <button className="up" onClick={() => setRoomForm({ id: r.id, name: r.name, description: r.description, price: r.price })}>Змінити</button>
@@ -361,7 +384,7 @@ function AdminPage() {
           {books.map(b => (
             <div className="admin-item">
               <span>
-                <p>Користувач: {users.find(u => u.id === b.userId).email}</p>
+                <p><b className="user">Користувач</b> {users.find(u => u.id === b.userId).email}</p>
                 <p>Кімната: {rooms.find(r => r.id === b.roomId)?.name || "Невідомо"}</p> 
                 <p>З {new Date(b.dateStart).toLocaleDateString()} по {new Date(b.dateEnd).toLocaleDateString()}</p>
                 <p>Вартість: {b.totalPrice} грн</p>
