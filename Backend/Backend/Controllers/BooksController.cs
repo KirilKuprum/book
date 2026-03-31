@@ -75,16 +75,24 @@ namespace Backend.Controllers
             return Ok(myBooks);
         }
 
-        [HttpGet("paged/{page}")]
+        [Authorize]
+        [HttpGet("my/paged/{page}")]
         public ActionResult<PagedResult<Book>> GetBooksPaged(int page, int size = 2)
         {
-            var books = _bookService.GetAll();
+            var nameIdentifier = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int userId = int.Parse(nameIdentifier);
+
+            var books = _bookService.GetBooksByUserId(userId);
+
+            var skip = (page - 1) * size;
+            var items = books.Skip(skip).Take(size).ToList();
+
             return Ok(new PagedResult<Book>()
             {
-                Items = books.GetRange((page - 1) * size, size),
+                Items = items,
                 TotalCount = books.Count(),
                 Page = page,
-                PagesCount = books.Count() / size,
+                PagesCount = (int)Math.Ceiling(books.Count() / (double)size),
                 PageSize = size
             });
         }

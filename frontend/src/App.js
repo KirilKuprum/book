@@ -28,16 +28,23 @@ function IndexPage() {
         console.log(data);
         setMyBookings(data); 
       })
-    .catch(err => { console.error("Помилка завантаження", err); });
   }
   function fetchUsers() {
-    fetch(`${API_URL}/Books/paged/${page}`)
-        .then(response => response.json())
-        .then(data =>{
-          //console.log(data);
-          setData(data.items);
-          setPagesCount(data.pagesCount);
-        })
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    fetch(`${API_URL}/Books/my/paged/${page}`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Помилка сервера");
+      return res.text(); 
+    })
+    .then(text => {
+      const data = text ? JSON.parse(text) : { items: [], pagesCount: 0 };
+      setData(data.items);
+      setPagesCount(data.pagesCount);
+    })
   }
 
   useEffect(fetchUsers, [page]);
@@ -93,8 +100,8 @@ function IndexPage() {
   return (
     <div className="container">
       <nav>
-        <span>Привіт, {user?.name}!</span> | 
-        {(user?.role === "Admin" || user?.role === "Moderator") && <Link to="/admin">Адмінка</Link>} | 
+        <span>{user?.name}!</span> | 
+        {(user?.role === "Admin" || user?.role === "Moderator") && <Link to="/admin">АдмінПанель</Link>} | 
         <button onClick={() => { 
           localStorage.clear(); 
           navigate("/login"); 
@@ -128,7 +135,7 @@ function IndexPage() {
               >
                 <option value="">Оберіть кімнату</option>
                 {rooms.filter(r => !r.isOccupied).map(r => (
-                  <option key={r.id} value={r.id}>{r.name}</option>
+                  <option value={r.id}>{r.name}</option>
                 ))}
               </select>
               <input 
