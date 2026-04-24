@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Введіть JWT токен"
+        Description = "пїЅпїЅпїЅпїЅпїЅпїЅ JWT пїЅпїЅпїЅпїЅпїЅ"
     });
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -57,7 +57,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            policy.WithOrigins("http://localhost:8000")
             .AllowAnyHeader()
             .AllowAnyMethod();
         })
@@ -75,6 +75,14 @@ builder.Services.AddScoped<BookService>();
 builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<Backend.DbContexts.UsersDbContext>();
+    
+    context.Database.Migrate(); 
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -82,7 +90,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowReact");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

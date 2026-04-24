@@ -2,7 +2,7 @@ import './App.css';
 import { Route, Routes, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-const API_URL = "https://localhost:7185";
+const API_URL = "http://localhost:7000";
 
 function IndexPage() {
   const navigate = useNavigate();

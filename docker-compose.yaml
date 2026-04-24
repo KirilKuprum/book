@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./ProjectFiles/Backend
+      dockerfile: ../../Dockerfiles/backend.Dockerfile
+    ports:
+      - "7000:8080"
+    volumes:
+      - ./backend-data:/app/data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/users.db
+
+  frontend:
+    build:
+      context: ./ProjectFiles/frontend
+      dockerfile: ../../Dockerfiles/frontend.Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
