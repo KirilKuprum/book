@@ -17,7 +17,15 @@ namespace UsersAPI.Controllers
             _userService = userService;
             _tokenService = tokenService;
         }
+        [HttpPatch("{id}/make-admin")] 
+        public ActionResult MakeAdmin(int id)
+        {
+            var result = _userService.MakeAdmin(id);
+            if (result)
+                return Ok($"Користувач з ID {id} тепер адміністратор.");
 
+            return NotFound("Користувача не знайдено.");
+        }
         [HttpGet]
         public ActionResult<List<UserDTO>> GetUsers()
         {
