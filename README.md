@@ -32,3 +32,16 @@ WebApi+React
   1. UsersContoller(login, register, me(для витягування даних з користувача який залогінився), get)
   2. RoomsController(CRUD)
   3. BooksController(CRUD)
+
+----------------------------------------------------------------------------------------------------------
+
+Як запустити цей додаток за допомогою Docker
+
+1. Відкрийте Docker Desktop
+2. Клонуйте цей репозиторій та відкрийте папку book у Visual Studio Code
+3. Відкрийте Terminal
+4. Пропишіть docker compose build
+5. Пропишіть docker compose up
+6. Впишіть у браузері localhost:7000 (backend + db) localhost:8000 (фронтенд)
+
+P.s Перед вписуванням команд у термінал провсяк випадок відкрийте папку Backend у Visual Studio та створіть міграцію якщо її нема.
